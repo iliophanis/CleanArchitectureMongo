@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("api/v1/[controller]/[action]")]
+    [Route("api/[controller]/[Action]")]
     public abstract class BaseController : ControllerBase
     {
         private ISender _mediator;

@@ -3,10 +3,13 @@ using Application.Common.Models;
 using Application.Entities;
 using Application.Entities.Commands;
 using Application.Entities.Queries;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
+    [Authorize]
     public class EntitiesController : BaseController
     {
         [HttpPost]
