@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 
 namespace Infrastructure
 {
@@ -19,13 +20,11 @@ namespace Infrastructure
         {
             var connectionString = configuration.GetSection("ConnectionString").Value;
             var databaseName = configuration.GetSection("DatabaseName").Value;
-            var issuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(configuration.GetSection("IssuerSigningKey").Value)
-            );
+            var issuerSigningKey = Encoding.UTF8.GetBytes(configuration.GetSection("IssuerSigningKey").Value);
 
             // Security
             services.AddTransient<IIdentityService, IdentityService>();
-            services.AddSingleton<ITokenGenerator>(new TokenGenerator(issuerSigningKey.ToString()));
+            services.AddSingleton<ITokenGenerator>(new TokenGenerator(issuerSigningKey));
             services.AddIdentity<ApplicationUser, MongoIdentityRole>(options =>
             {
                 options.Password.RequireDigit = false;
@@ -49,31 +48,16 @@ namespace Infrastructure
                     opt.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = issuerSigningKey,
+                        IssuerSigningKey = new SymmetricSecurityKey(issuerSigningKey),
                         ValidateAudience = false,
                         ValidateIssuer = false,
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero
                     };
-                    opt.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = context =>
-                        {
-                            var accessToken = context.Request.Query["access_token"];
-                            var path = context.HttpContext.Request.Path;
-                            if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/chat")))
-                            {
-                                context.Token = accessToken;
-                            }
-                            return Task.CompletedTask;
-                        }
-                    };
                 });
 
             // Persistence
             services.AddSingleton<IContext>(new Context(connectionString, databaseName));
-
-
 
             return services;
         }

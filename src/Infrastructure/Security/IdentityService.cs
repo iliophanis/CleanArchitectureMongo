@@ -49,13 +49,9 @@ namespace Infrastructure.Security
 
         public async Task<(Result Result, string UserId)> LoginUserAsync(string userName, string password)
         {
-            var user = new ApplicationUser
-            {
-                UserName = userName,
-                Email = userName,
-            };
+            var user = await _userManager.FindByNameAsync(userName);
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
+            var result = await _signInManager.PasswordSignInAsync(user, password, false, false);
 
             return (result.ToApplicationResult(), user.Id.ToString());
         }

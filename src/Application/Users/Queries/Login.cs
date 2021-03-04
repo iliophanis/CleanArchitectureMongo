@@ -1,3 +1,6 @@
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using FluentValidation;
 using MediatR;
@@ -17,7 +20,7 @@ namespace Application.Users.Commands
         #region Validator
         public class QueryValidator : AbstractValidator<Query>
         {
-            public CommandValidator()
+            public QueryValidator()
             {
                 RuleFor(r => r.Username).NotEmpty();
                 RuleFor(r => r.Password).NotEmpty();
@@ -41,9 +44,9 @@ namespace Application.Users.Commands
 
             public async Task<string> Handle(Query request, CancellationToken cancellationToken)
             {
-                var (result, userId) = await _identityService.Login(request.Username, request.Password);
+                var (result, userId) = await _identityService.LoginUserAsync(request.Username, request.Password);
                 if (!result.Succeeded)
-                    throw new BadRequestException("");
+                    throw new BadRequestException(string.Concat(result.Errors));
 
                 return _tokenGenerator.CreateToken(userId);
             }

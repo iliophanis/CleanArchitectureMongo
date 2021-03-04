@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using Application.Common.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 
@@ -12,9 +11,9 @@ namespace Infrastructure.Security
     {
         private readonly SymmetricSecurityKey _symmetricSecurityKey;
 
-        public TokenGenerator(string issuerSigningKey)
+        public TokenGenerator(byte[] issuerSigningKey)
         {
-            _symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(issuerSigningKey));
+            _symmetricSecurityKey = new SymmetricSecurityKey(issuerSigningKey);
         }
 
         public string CreateToken(string userId)

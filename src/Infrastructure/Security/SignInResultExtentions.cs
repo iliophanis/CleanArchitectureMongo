@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Application.Common.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -9,7 +10,7 @@ namespace Infrastructure.Security
         {
             return result.Succeeded
                 ? Result.Success()
-                : Result.Failure();
+                : Result.Failure(new List<string> { "Login failed." });
         }
     }
 }

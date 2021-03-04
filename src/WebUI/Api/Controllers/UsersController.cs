@@ -11,5 +11,11 @@ namespace Api.Controllers
         {
             return await Mediator.Send(request);
         }
+
+        [HttpPost]
+        public async Task<ActionResult<string>> Login(Login.Query request)
+        {
+            return await Mediator.Send(request);
+        }
     }
 }
