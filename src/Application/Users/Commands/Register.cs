@@ -12,7 +12,7 @@ namespace Application.Users.Commands
         #region Command
         public class Command : IRequest<string>
         {
-            public string Username { get; set; }
+            public string EmailAddress { get; set; }
             public string Password { get; set; }
         }
         #endregion
@@ -22,7 +22,7 @@ namespace Application.Users.Commands
         {
             public CommandValidator()
             {
-                RuleFor(r => r.Username).NotEmpty();
+                RuleFor(r => r.EmailAddress).NotEmpty().EmailAddress();
                 RuleFor(r => r.Password).NotEmpty();
             }
         }
@@ -44,7 +44,7 @@ namespace Application.Users.Commands
 
             public async Task<string> Handle(Command request, CancellationToken cancellationToken)
             {
-                var (result, userId) = await _identityService.CreateUserAsync(request.Username, request.Password);
+                var (result, userId) = await _identityService.CreateUserAsync(request.EmailAddress, request.Password);
                 if (!result.Succeeded)
                     throw new BadRequestException("");
 

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text;
-using System.Threading.Tasks;
 using Application.Common.Interfaces;
 using AspNetCore.Identity.MongoDbCore.Models;
+using Infrastructure.Emails;
 using Infrastructure.Persistence;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
 
 namespace Infrastructure
 {
@@ -18,9 +17,14 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration)
         {
+            var emailConfiguration = configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
             var connectionString = configuration.GetSection("ConnectionString").Value;
             var databaseName = configuration.GetSection("DatabaseName").Value;
             var issuerSigningKey = Encoding.UTF8.GetBytes(configuration.GetSection("IssuerSigningKey").Value);
+
+            // Emails
+            services.AddSingleton<IEmailConfiguration>(emailConfiguration);
+            services.AddSingleton<IEmailService, EmailService>();
 
             // Security
             services.AddTransient<IIdentityService, IdentityService>();

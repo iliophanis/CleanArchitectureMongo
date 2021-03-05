@@ -37,18 +37,26 @@ namespace Application.Entities.Commands
         public class Handler : IRequestHandler<Command, string>
         {
             private readonly IContext _context;
-            public Handler(IContext context)
+            private readonly ICurrentUserService _currentUserService;
+
+            public Handler(IContext context, ICurrentUserService currentUserService)
             {
                 _context = context;
+                _currentUserService = currentUserService;
             }
 
             public async Task<string> Handle(Command request, CancellationToken cancellationToken)
             {
                 var entity = new Entity
                 {
+                    CreatedBy = _currentUserService.UserId,
                     DateCreated = DateTime.Now,
+                    LastUpdatedBy = _currentUserService.UserId,
                     DateLastUpdated = DateTime.Now,
-                    Name = request.Name
+                    Name = request.Name,
+                    Description = request.Description,
+                    Age = request.Age,
+                    Factor = request.Factor
                 };
 
                 await _context.Entities.InsertOneAsync(entity);

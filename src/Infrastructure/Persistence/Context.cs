@@ -12,6 +12,7 @@ namespace Infrastructure.Persistence
     public class Context : IContext
     {
         public IMongoCollection<Entity> Entities { get; set; }
+        public IMongoCollection<UserProfile> UserProfiles { get; set; }
 
         public Context(string connectionString, string databaseName)
         {
@@ -22,12 +23,14 @@ namespace Infrastructure.Persistence
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
 
             Entities = mongoDatabase.GetCollection<Entity>("entities");
+            UserProfiles = mongoDatabase.GetCollection<UserProfile>("userProfiles");
         }
 
         public void Init()
         {
             BsonClassMap.RegisterClassMap(new AuditableEntityClassMap());
             BsonClassMap.RegisterClassMap(new EntityClassMap());
+            BsonClassMap.RegisterClassMap(new UserProfileClassMap());
         }
 
         public async Task<Envelope<T>> GetEnvelopeAsync<T>(

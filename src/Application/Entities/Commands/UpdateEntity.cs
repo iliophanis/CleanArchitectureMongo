@@ -29,6 +29,7 @@ namespace Application.Entities.Commands
         {
             public CommandValidator()
             {
+                RuleFor(r => r.Id).ValidObjectId();
                 RuleFor(r => r.Name).NotEmpty();
                 RuleFor(r => r.Description.Length).ExclusiveBetween(0, 255);
                 RuleFor(r => r.Age).NotEmpty();
@@ -41,9 +42,12 @@ namespace Application.Entities.Commands
         public class Handler : IRequestHandler<Command, string>
         {
             private readonly IContext _context;
-            public Handler(IContext context)
+            private readonly ICurrentUserService _currentUserService;
+
+            public Handler(IContext context, ICurrentUserService currentUserService)
             {
                 _context = context;
+                _currentUserService = currentUserService;
             }
 
             public async Task<string> Handle(Command request, CancellationToken cancellationToken)
@@ -59,6 +63,7 @@ namespace Application.Entities.Commands
                     .Set(e => e.Description, request.Description)
                     .Set(e => e.Age, request.Age)
                     .Set(e => e.Factor, request.Factor)
+                    .Set(e => e.LastUpdatedBy, _currentUserService.UserId)
                     .Set(e => e.DateLastUpdated, DateTime.Now);
                 await _context.Entities.UpdateOneAsync(filter, update);
 

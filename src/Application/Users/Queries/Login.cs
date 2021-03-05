@@ -12,7 +12,7 @@ namespace Application.Users.Commands
         #region Query
         public class Query : IRequest<string>
         {
-            public string Username { get; set; }
+            public string EmailAddress { get; set; }
             public string Password { get; set; }
         }
         #endregion
@@ -22,7 +22,7 @@ namespace Application.Users.Commands
         {
             public QueryValidator()
             {
-                RuleFor(r => r.Username).NotEmpty();
+                RuleFor(r => r.EmailAddress).NotEmpty().EmailAddress();
                 RuleFor(r => r.Password).NotEmpty();
             }
         }
@@ -44,7 +44,7 @@ namespace Application.Users.Commands
 
             public async Task<string> Handle(Query request, CancellationToken cancellationToken)
             {
-                var (result, userId) = await _identityService.LoginUserAsync(request.Username, request.Password);
+                var (result, userId) = await _identityService.LoginUserAsync(request.EmailAddress, request.Password);
                 if (!result.Succeeded)
                     throw new BadRequestException(string.Concat(result.Errors));
 

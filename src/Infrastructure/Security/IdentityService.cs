@@ -34,12 +34,12 @@ namespace Infrastructure.Security
             return user.UserName;
         }
 
-        public async Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password)
+        public async Task<(Result Result, string UserId)> CreateUserAsync(string emailAddress, string password)
         {
             var user = new ApplicationUser
             {
-                UserName = userName,
-                Email = userName,
+                UserName = emailAddress,
+                Email = emailAddress,
             };
 
             var result = await _userManager.CreateAsync(user, password);
@@ -47,9 +47,9 @@ namespace Infrastructure.Security
             return (result.ToApplicationResult(), user.Id.ToString());
         }
 
-        public async Task<(Result Result, string UserId)> LoginUserAsync(string userName, string password)
+        public async Task<(Result Result, string UserId)> LoginUserAsync(string emailAddress, string password)
         {
-            var user = await _userManager.FindByNameAsync(userName);
+            var user = await _userManager.FindByEmailAsync(emailAddress);
 
             var result = await _signInManager.PasswordSignInAsync(user, password, false, false);
 
